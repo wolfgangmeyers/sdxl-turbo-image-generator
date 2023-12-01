@@ -77,7 +77,12 @@ def create_placeholder():
 def save_image():
     global current_image
     if current_image:
-        file_path = filedialog.asksaveasfilename(defaultextension=".png", filetypes=[("PNG files", "*.png")])
+        prompt_value = prompt_entry.get()
+        # truncate prompt if too long
+        if len(prompt_value) > 100:
+            prompt_value = prompt_value[:100]
+        file_name = f"{prompt_value}.png" if prompt_value else "image.png"
+        file_path = filedialog.asksaveasfilename(defaultextension=".png", initialfile=file_name, filetypes=[("PNG files", "*.png")])
         if file_path:
             current_image.save(file_path)
 
