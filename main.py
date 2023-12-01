@@ -12,12 +12,15 @@ from PIL import Image, ImageTk, ImageDraw
 current_image = None
 
 generator = torch.Generator(device=torch.device("cuda"))
+last_prompt = None
 
 latents = None
 
 def reset_latents():
     global latents
+    global last_prompt
     latents = None
+    last_prompt = None
     generate_image()
 
 def get_latents():
@@ -39,8 +42,12 @@ def get_latents():
     return latents
     
 def generate_image():
+    global last_prompt
     global current_image
     prompt = prompt_entry.get()
+    if prompt == last_prompt:
+        return
+    last_prompt = prompt
     result = pipe(prompt=prompt, num_inference_steps=1, guidance_scale=0.0, latents=get_latents())
     image = result.images[0]
     current_image = image  # Store the PIL image
@@ -55,7 +62,7 @@ def on_type(event=None):
     global typing_delay
     if typing_delay is not None:
         window.after_cancel(typing_delay)
-    typing_delay = window.after(500, generate_image)
+    typing_delay = window.after(250, generate_image)
 
 def create_placeholder():
     # Create an image with the same dimensions as the generated images
